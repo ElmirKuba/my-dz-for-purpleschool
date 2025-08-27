@@ -1,3 +1,7 @@
+var makeOrdinal = require('./makeOrdinal');
+var isFinite = require('./isFinite');
+var isSafeNumber = require('./isSafeNumber');
+
 enum NUMBERS {
   TEN = 10,
   ONE_HUNDRED = 100,
@@ -62,14 +66,12 @@ function toWords(number: number | string, asOrdinal: boolean): string {
       'Не конечное число: ' + number + ' (' + typeof number + ')'
     );
   }
-  // @ts-ignore - Чтобы компилятор не ругался на отсутствующий метод
   if (!isSafeNumber(num)) {
     throw new RangeError(
       'Вводимое число не является безопасным, оно либо слишком большое, либо слишком маленькое.'
     );
   }
   words = generateWords(num);
-  // @ts-ignore - Чтобы компилятор не ругался на отсутствующий метод
   return asOrdinal ? makeOrdinal(words) : words;
 }
 
