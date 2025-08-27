@@ -1,0 +1,14 @@
+{
+  "name": "my-dz-for-purpleschool",
+  "version": "0.0.1",
+  "description": "Мое ДЗ для того чтобы сдавать на проверку для курса по TypeScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ElmirKuba",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}
