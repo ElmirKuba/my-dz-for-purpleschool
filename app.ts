@@ -72,7 +72,7 @@ interface IUser {
 
 /**
  * Функция вернет имя и фамилию вместе
- * @param {any} userEntity - Объект данных о пользователе
+ * @param {IUser} userEntity - Объект данных о пользователе
  * @returns {string} - Имя и фамилия вместе
  */
 function getFullName35(userEntity: IUser): string {
@@ -252,3 +252,162 @@ async function getFaqs(req: {
   return data;
 }
 // __________________________________________________ 3.11
+
+// __________________________________________________ 4.2
+/**
+ * Логируем идентификатор
+ * @param {string | number} id - Аргумент с идентификатором
+ * @returns {void} - Нечего возвращать
+ */
+function logId(id: string | number): void {
+  if (typeof id === 'string') {
+    console.log(id.toLowerCase());
+  } else if (typeof id === 'number') {
+    console.log(id.toString());
+  } else {
+    console.log(id);
+  }
+}
+
+logId(1);
+logId('1');
+
+/**
+ * Вывести в лог одну строку или массив строк
+ * @param {string | string[]} text - Строка или массив строк
+ * @returns {void} - Нечего возвращать
+ */
+function logArrayOrOneStringText(text: string | string[]): void {
+  if (Array.isArray(text)) {
+    for (const textItem of text) {
+      console.log(textItem);
+    }
+  } else {
+    console.log(text);
+  }
+}
+
+logArrayOrOneStringText('Текст одной строкой');
+logArrayOrOneStringText(['Первая строка', 'Вторая строка']);
+
+/**
+ * Логировать объект
+ * @param {{a: number} | {b: number}} obj - Объект
+ * @returns {void} - Нечего возвращать
+ */
+function logObject(obj: { a: number } | { b: number }): void {
+  if ('a' in obj) {
+    console.log(obj.a);
+  } else if ('b' in obj) {
+    console.log(obj.b);
+  }
+}
+
+logObject({ a: 1 });
+logObject({ b: 2 });
+// __________________________________________________ 4.2
+
+// __________________________________________________ 4.3
+/**
+ * Функция для изучения union
+ * @param {'MAMA' | true} unionVariable - тип данных для изучения union
+ * @returns {void} - Нечего возвращать
+ */
+function testFnWithUnionType(unionVariable: 'MAMA' | true): void {
+  console.log(unionVariable);
+}
+
+testFnWithUnionType('MAMA');
+testFnWithUnionType(true);
+// __________________________________________________ 4.3
+
+// __________________________________________________ 4.7
+/**
+ * Функция умножит первое число на второе или первое на само себя если второе не передано
+ * @param {number} first - Первое число
+ * @param {number=} second - Второе число
+ * @returns {number} - Результат умножения первого числа на второе или первого на само себя
+ */
+function multiply(first: number, second?: number): number {
+  if (!second) {
+    return first * first;
+  }
+
+  return first * second;
+}
+
+console.log(multiply(5, 4));
+console.log(multiply(5));
+// __________________________________________________ 4.7
+
+// __________________________________________________ 4.8
+/** Данные платежа */
+interface PaymentDetails {
+  /** Сумма платежа */
+  sum: number;
+  /** От кого (скорее всего идентификатор аккаунта number) */
+  from: number;
+  /** Кому (скорее всего идентификатор аккаунта number) */
+  to: number;
+}
+
+/** Статусы платежа */
+enum StatusesPayment {
+  /** Платеж прошел успешно */
+  Success = 'success',
+  /** Платеж завершился с ошибкой */
+  Failed = 'failed',
+}
+
+/** Данные успешного платежа */
+interface SuccessPaymentData extends PaymentDetails {
+  /** Идентификатор платежа в базе данных */
+  databaseId: number;
+}
+
+/** Данные платежа, который завершился с ошибкой */
+interface FailedPaymentData {
+  /** Текст ошибки */
+  errorMessage: string;
+  /** Код ошибки */
+  errorCode: number;
+}
+
+/** Результат выполнения платежа завершился успехом */
+interface ResultExecutablePaymentSuccess {
+  /** Статус выполнения платежа */
+  status: StatusesPayment.Success;
+  /** Данные выполнения платежа */
+  data: SuccessPaymentData;
+}
+
+/** Результат выполнения платежа завершился ошибкой */
+interface ResultExecutablePaymentFailed {
+  /** Статус выполнения платежа */
+  status: StatusesPayment.Failed;
+  /** Данные выполнения платежа */
+  data: FailedPaymentData;
+}
+
+const successPaymentResult: ResultExecutablePaymentSuccess = {
+  status: StatusesPayment.Success,
+  data: {
+    sum: 1000,
+    from: 1,
+    to: 2,
+    databaseId: 1,
+  },
+};
+
+console.log(successPaymentResult);
+
+const failedPaymentResult: ResultExecutablePaymentFailed = {
+  status: StatusesPayment.Failed,
+  data: {
+    errorMessage: 'Ошибка на стороне сервера',
+    errorCode: 1,
+  },
+};
+
+console.log(failedPaymentResult);
+// __________________________________________________ 4.8
