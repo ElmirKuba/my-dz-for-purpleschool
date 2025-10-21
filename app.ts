@@ -351,6 +351,9 @@ interface PaymentDetails {
   to: number;
 }
 
+/** Запрос на оплату */
+interface IPaymentRequest extends PaymentDetails {}
+
 /** Статусы платежа */
 enum StatusesPayment {
   /** Платеж прошел успешно */
@@ -411,3 +414,175 @@ const failedPaymentResult: ResultExecutablePaymentFailed = {
 
 console.log(failedPaymentResult);
 // __________________________________________________ 4.8
+
+// __________________________________________________ 4.10
+/** Класс ошибки never */
+class NeverError extends Error {
+  /**
+   * Конструктор класса ошибки never
+   * @param {string} message - Сообщение для вывода в ошибку
+   * @param {never} value - Объект который надо проверить на never
+   */
+  constructor(message: string, value: never) {
+    super(`${message}: ${value}`);
+  }
+}
+
+/**
+ * Метод создания пользователя
+ * @param {IUser} userDetails - Данные пользователя для его создания
+ * @returns {void} - Нечего возвращать
+ */
+function createUser(userDetails: IUser): void {
+  if (userDetails) {
+    // создание пользователя
+  } else {
+    checkNeverType(`Неизвестный вид пользователя`, userDetails);
+  }
+}
+
+createUser({
+  ...userData,
+});
+
+/**
+ * Функция проверки на never
+ * @param {string} message - Сообщение для вывода в ошибку
+ * @param {never} value - Объект который надо проверить на never
+ * @returns {void} - Нечего возвращать
+ */
+function checkNeverType(message: string, value: never): void {
+  throw new NeverError(message, value);
+}
+
+/** Тип действий */
+type PaymentAction = 'refund' | 'checkout' | 'reject';
+
+/**
+ * Произвести какое-то действие
+ * @param {PaymentAction} action - Какое-то действие
+ * @returns {void} - Нечего возвразать
+ */
+function processAction(action: PaymentAction): void {
+  switch (action) {
+    case 'refund': {
+      // действия с refund...
+      break;
+    }
+    case 'checkout': {
+      // действия с checkout...
+      break;
+    }
+    case 'reject': {
+      // действия с reject...
+      break;
+    }
+    default: {
+      checkNeverType('Нет такого действия', action);
+      break;
+    }
+  }
+}
+
+processAction('checkout');
+// __________________________________________________ 4.10
+
+// __________________________________________________ 4.12
+/** Интефейс администратора */
+interface IAdmin extends Pick<IUser, 'firstName' | 'surName'> {
+  /** Уровень админки */
+  level: number;
+}
+
+/** Объект админа */
+const adminObj = userToAdmin(userData);
+console.log(adminObj);
+
+/**
+ * Функция преобразования пользователя в админа
+ * @param {IUser} userDetails - Данные пользователя
+ * @returns {IAdmin} - Данные админа из данных пользователя
+ */
+function userToAdmin(userDetails: IUser): IAdmin {
+  return {
+    firstName: userData.firstName,
+    surName: userData.surName,
+    level: 1,
+  };
+}
+// __________________________________________________ 4.12
+
+// __________________________________________________ 4.13
+/**
+ * Функция проверки на строку
+ * @param {unknown} str - Входные данные которые надо проверить на строку
+ * @returns {boolean} - Результат проверки на строку
+ */
+function isString(str: unknown): str is string {
+  return typeof str === 'string';
+}
+
+/**
+ * Логирование строки
+ * @param {string | number} str - Входные данные которые надо логировать если это строка
+ * @returns {void} - Нечего возвращать
+ */
+function logString(str: string | number): void {
+  if (isString(str)) {
+    console.log(str);
+  }
+}
+
+logString('mama');
+
+/**
+ * Функция проверки на админа
+ * @param {IUser | IAdmin} objDetails - Данные которые надо проверить
+ * @returns {boolean} - Результат проверки на админа
+ */
+function isAdmin(objDetails: IUser | IAdmin): objDetails is IAdmin {
+  return 'level' in objDetails;
+}
+
+console.log(isAdmin(adminObj));
+// __________________________________________________ 4.13
+
+// __________________________________________________ 4.14
+/** Описание функции */
+type TF = (
+  res: ResultExecutablePaymentSuccess | ResultExecutablePaymentFailed
+) => number;
+
+/**
+ * Проверит платеж на успешность
+ * @param {ResultExecutablePaymentSuccess | ResultExecutablePaymentFailed} res - Данные платежа
+ * @returns {boolean} - Результат проверки на успешность платежа
+ */
+function isSuccessPayment(
+  res: ResultExecutablePaymentSuccess | ResultExecutablePaymentFailed
+): res is ResultExecutablePaymentSuccess {
+  if (res.status === StatusesPayment.Success) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Достанем идентификатор платежа
+ * @param {ResultExecutablePaymentSuccess | ResultExecutablePaymentFailed} res - Данные платежа
+ * @returns {number} - Результат платежа
+ * @throws - Исключение, если платеж не успешен
+ */
+const getIdFromData: TF = (
+  res: ResultExecutablePaymentSuccess | ResultExecutablePaymentFailed
+): number => {
+  if (isSuccessPayment(res)) {
+    return res.data.databaseId;
+  }
+
+  throw new Error(res.data.errorMessage);
+};
+
+console.log(getIdFromData(failedPaymentResult));
+console.log(getIdFromData(successPaymentResult));
+// __________________________________________________ 4.14
